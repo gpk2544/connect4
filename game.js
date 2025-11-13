@@ -24,11 +24,15 @@ const returnToLobbyBtn = document.getElementById('returnToLobbyBtn');
 
 // --- Initialization ---
 function initGame() {
+    console.log("Initializing game...");
     const urlParams = new URLSearchParams(window.location.search);
     roomId = urlParams.get('room');
     playerId = urlParams.get('player');
 
+    console.log("Room ID:", roomId, "Player ID:", playerId);
+
     if (!roomId || !playerId) {
+        console.error("Missing room or player ID");
         window.location.href = "index.html"; 
         return;
     }
@@ -37,6 +41,7 @@ function initGame() {
     
     // --- Setup Listeners ---
     onValue(roomRef, (snap) => {
+        console.log("Firebase data received:", snap.exists());
         if (!snap.exists()) {
             alert("Game session ended.");
             window.location.href = "index.html";
@@ -44,22 +49,27 @@ function initGame() {
         }
 
         const roomData = snap.val();
+        console.log("Room data:", roomData);
         
         // Determine player roles on first load
         if (!myPlayerNumber) {
             playerIds = Object.keys(roomData.players);
             myPlayerNumber = playerIds[0] === playerId ? PLAYER_1 : PLAYER_2;
+            console.log("My player number:", myPlayerNumber, "Player IDs:", playerIds);
         }
         
         // Player 1 (host) initializes the game state once the game starts
-        // FIX APPLIED HERE: Initialize if P1 and no board exists, regardless of 'inGame' status.
         if (myPlayerNumber === PLAYER_1 && !roomData.board) { 
+            console.log("Initializing board as Player 1");
             initializeFirebaseBoard(roomRef, roomData.players);
         }
         
         // Render and update UI
         if (roomData.board) {
+            console.log("Rendering board");
             renderBoard(roomData);
+        } else {
+            console.log("No board data available yet");
         }
         updateUI(roomData);
     });
@@ -126,9 +136,7 @@ async function leaveGame(roomId, playerId) {
     }
 }
 
-
 // --- DOM Rendering and UI Logic ---
-
 function renderBoard(roomData) {
     const board = roomData.board;
     boardContainer.innerHTML = '';
@@ -155,7 +163,7 @@ function renderBoard(roomData) {
 
             const playerValue = board[r][c];
             if (playerValue === PLAYER_1) {
-                piece.classList.add('player-1', 'dropped'); // 'dropped' triggers CSS transform
+                piece.classList.add('player-1', 'dropped');
             } else if (playerValue === PLAYER_2) {
                 piece.classList.add('player-2', 'dropped');
             }
@@ -179,7 +187,7 @@ function updateUI(roomData) {
     // 2. Handle Game Status and End Screen
     endScreen.classList.add('hidden');
     boardContainer.classList.remove('game-over');
-    returnToLobbyBtn.textContent = "Return to Lobby"; // Default text
+    returnToLobbyBtn.textContent = "Return to Lobby";
 
     if (roomData.gameStatus === "playing") {
         gameStatus.textContent = isMyTurn 
@@ -195,8 +203,6 @@ function updateUI(roomData) {
         } else if (roomData.winnerId === playerId) {
             message = "You Win! 🎉";
             returnToLobbyBtn.textContent = "Continue to Lobby";
-        } else if (roomData.winnerId === "draw") {
-            message = "Game Over: It's a Draw! 🤝";
         } else {
             message = `${roomData.players[roomData.winnerId]?.name} Wins! 😭`;
         }
@@ -208,18 +214,15 @@ function updateUI(roomData) {
         boardContainer.classList.add('game-over');
 
         // Play Again logic
-        if (myPlayerNumber === PLAYER_1) { // Only P1 manages the button presence
+        if (myPlayerNumber === PLAYER_1) {
             playAgainBtn.classList.remove('hidden');
         } else {
-             // For P2, the button only shows if P1 has triggered a reset
-             playAgainBtn.classList.add('hidden');
+            playAgainBtn.classList.add('hidden');
         }
     }
 }
 
-
 // --- Core Game Logic ---
-
 async function makeMove(board, col) {
     const roomRef = ref(window.db, `rooms/${roomId}`);
     const snap = await get(roomRef);
@@ -252,7 +255,7 @@ async function makeMove(board, col) {
     if (winner) {
         updateData.gameStatus = "finished";
         updateData.winnerId = playerId;
-        updateData.status = "waiting"; // Makes room visible in lobby for cleanup
+        updateData.status = "waiting";
     } else if (roomData.moves + 1 === ROWS * COLS) {
         updateData.gameStatus = "finished";
         updateData.winnerId = "draw";
