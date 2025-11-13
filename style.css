@@ -223,4 +223,157 @@ button:disabled {
 }
 
 .player-1 { color: #FF0000; font-weight: bold; }
+
 .player-2 { color: #FFD700; font-weight: bold; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+}
+
+#game-title {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.player-1 { color: #e74c3c; }
+.player-2 { color: #f1c40f; }
+
+#game-status {
+    font-size: 1.2em;
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.status-my-turn {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-waiting {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* Connect Four Board Styles */
+#board-area {
+    margin: 20px 0;
+}
+
+#board-container {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 7), 60px);
+    grid-template-rows: repeat(var(--rows, 6), 60px);
+    gap: 5px;
+    background-color: #2980b9;
+    padding: 10px;
+    border-radius: 10px;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.connect4-column {
+    display: contents;
+    cursor: pointer;
+}
+
+.connect4-column:hover .connect4-slot:first-child {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.connect4-slot {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.connect4-piece {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transform: translateY(-500px);
+    transition: transform 0.5s ease-in-out;
+}
+
+.connect4-piece.dropped {
+    transform: translateY(0);
+}
+
+.connect4-piece.player-1 {
+    background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+.connect4-piece.player-2 {
+    background: radial-gradient(circle at 30% 30%, #f1c40f, #f39c12);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* Buttons and End Screen */
+#end-screen {
+    margin: 20px 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+button {
+    padding: 12px 24px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.primary:hover {
+    background-color: #2980b9;
+}
+
+.secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.board-container.game-over .connect4-column {
+    cursor: not-allowed;
+}
