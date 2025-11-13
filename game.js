@@ -1,5 +1,5 @@
 // game.js
-import { ref, update, onValue, remove, get } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js"; // UPDATED VERSION
+import { ref, update, onValue, remove, get } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
 // --- Constants ---
 const ROWS = 6;
@@ -49,11 +49,12 @@ function initGame() {
         if (!myPlayerNumber) {
             playerIds = Object.keys(roomData.players);
             myPlayerNumber = playerIds[0] === playerId ? PLAYER_1 : PLAYER_2;
-            
-            // Player 1 (host) initializes the game state once the game starts
-            if (myPlayerNumber === PLAYER_1 && roomData.status === "inGame" && !roomData.board) {
-                initializeFirebaseBoard(roomRef);
-            }
+        }
+        
+        // Player 1 (host) initializes the game state once the game starts
+        // FIX APPLIED HERE: Initialize if P1 and no board exists, regardless of 'inGame' status.
+        if (myPlayerNumber === PLAYER_1 && !roomData.board) { 
+            initializeFirebaseBoard(roomRef, roomData.players);
         }
         
         // Render and update UI
@@ -83,10 +84,13 @@ function createInitialBoard() {
     return Array(ROWS).fill(0).map(() => Array(COLS).fill(EMPTY));
 }
 
-async function initializeFirebaseBoard(roomRef) {
+async function initializeFirebaseBoard(roomRef, players) {
+    // Determine the player IDs again for safety
+    const pIds = Object.keys(players);
+    
     await update(roomRef, {
         board: createInitialBoard(),
-        currentPlayer: playerIds[0], 
+        currentPlayer: pIds[0], 
         gameStatus: "playing",
         moves: 0,
         winnerId: null
