@@ -140,8 +140,10 @@ function listenRooms() {
             .sort((a, b) => parseInt(a) - parseInt(b))
             .forEach((id) => {
                 const room = rooms[id];
-                // Only show rooms that are open to joining/readying
-                if (room.status === "waiting" || room.status === "starting") {
+                const isInRoom = room.players && room.players[playerId]; // Check if current player is in room
+
+                // FIX: Render the room if it's waiting/starting OR if the current player is inside it.
+                if (room.status === "waiting" || room.status === "starting" || isInRoom) {
                     renderRoom(room);
                 }
             });
@@ -213,7 +215,11 @@ function renderRoom(room) {
         redirectToGame(room.id, room.players);
     }
 
-    roomsList.appendChild(div);
+    if (room.status === "waiting" || room.status === "starting") {
+        roomsList.appendChild(div);
+    } 
+    // Do not append rooms with status "inGame" to the main list; 
+    // we only rendered them to ensure redirect logic fires.
 }
 
 // === Game Start Logic ===
