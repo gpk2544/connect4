@@ -76,6 +76,7 @@ async function registerPlayer() {
 
     // Remove player from lobby/room on browser close/refresh
     window.addEventListener("beforeunload", async () => {
+        // This hook runs when navigating away (including redirecting to game.html)
         if (currentRoomId) await leaveRoom(currentRoomId);
         await remove(playerRef);
     });
@@ -113,7 +114,7 @@ async function leaveRoom(roomId, forceLeave = false) {
     if (!roomId) return;
     const playerPath = ref(window.db, `rooms/${roomId}/players/${playerId}`);
     await remove(playerPath);
-    currentRoomId = null;
+    currentRoomId = null; // Clears the currentRoomId here
     createBtn.disabled = false;
 
     // Check if the room is empty and remove it
@@ -142,7 +143,7 @@ function listenRooms() {
                 const room = rooms[id];
                 const isInRoom = room.players && room.players[playerId]; // Check if current player is in room
 
-                // FIX: Render the room if it's waiting/starting OR if the current player is inside it.
+                // Render the room if it's waiting/starting OR if the current player is inside it (essential for redirect).
                 if (room.status === "waiting" || room.status === "starting" || isInRoom) {
                     renderRoom(room);
                 }
@@ -215,11 +216,10 @@ function renderRoom(room) {
         redirectToGame(room.id, room.players);
     }
 
+    // Only append rooms that should be visible in the lobby
     if (room.status === "waiting" || room.status === "starting") {
         roomsList.appendChild(div);
     } 
-    // Do not append rooms with status "inGame" to the main list; 
-    // we only rendered them to ensure redirect logic fires.
 }
 
 // === Game Start Logic ===
@@ -267,6 +267,11 @@ function redirectToGame(roomId, players) {
          // Listen for the final 'inGame' status
          onValue(statusRef, (snap) => {
              if (snap.exists() && snap.val() === "inGame") {
+                 // **CRITICAL FIX:** Clear currentRoomId before redirecting.
+                 // This prevents the 'beforeunload' listener from calling leaveRoom 
+                 // and deleting the room when navigating to game.html.
+                 currentRoomId = null; 
+                 
                  window.location.href = `game.html?room=${roomId}&player=${playerId}`;
              }
          }, { onlyOnce: true });
