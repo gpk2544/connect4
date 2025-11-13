@@ -1,0 +1,226 @@
+/* --- Global & Lobby Styles --- */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+#lobby-container, #game-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 950px;
+}
+
+h1 {
+    text-align: center;
+    color: #3f51b5;
+    margin-bottom: 25px;
+}
+
+/* --- Buttons & Inputs --- */
+input, button {
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    color: white;
+}
+
+.primary {
+    background-color: #00bcd4;
+}
+.primary:hover:not(:disabled) {
+    background-color: #0097a7;
+}
+
+.secondary {
+    background-color: #f44336;
+}
+.secondary:hover:not(:disabled) {
+    background-color: #d32f2f;
+}
+
+button:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+}
+
+/* --- Lobby Layout --- */
+.hidden {
+    display: none !important;
+}
+
+#lobby-view {
+    display: flex;
+    gap: 20px;
+}
+
+#lobby-view .column {
+    flex: 1;
+}
+
+.list-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.room {
+    border: 1px solid #c5cae9;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.room-header {
+    background-color: #e8eaf6;
+    padding: 10px;
+    font-weight: bold;
+    color: #3f51b5;
+}
+
+.room-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+.countdown {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* --- Connect4 Board Styles --- */
+
+#board-area {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+#board-container {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+    gap: 5px;
+    background-color: #3f51b5; /* Blue board color */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    aspect-ratio: 7 / 6;
+    transition: filter 0.3s;
+}
+
+/* Blur the board when game is over (visual feedback) */
+#board-container.game-over {
+    filter: blur(2px);
+}
+
+.connect4-column {
+    display: contents; 
+    transition: background-color 0.2s;
+}
+
+.connect4-column:hover .connect4-slot {
+    /* Highlight the target column when active */
+    background-color: #5c6bc0; 
+}
+
+.connect4-slot {
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    background-color: white;
+    border-radius: 50%; 
+    position: relative;
+    overflow: hidden; 
+}
+
+.connect4-piece {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+    top: -100%; /* Start piece above the slot */
+    
+    /* THE KEY ANIMATION */
+    transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1.4); /* Smooth, bouncy drop */
+}
+
+/* 'dropped' class is added by JS to trigger the animation */
+.connect4-piece.dropped {
+    transform: translateY(200%); /* Moves piece down into the slot */
+}
+
+/* Piece Colors */
+.connect4-piece.player-1 {
+    background-color: #FF0000; /* Red */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.connect4-piece.player-2 {
+    background-color: #FFD700; /* Yellow */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Game Status and End Screen --- */
+#game-info {
+    text-align: center;
+    margin-bottom: 20px;
+    min-height: 40px; /* Prevent layout shift */
+}
+
+#game-status {
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: inline-block;
+}
+
+.status-my-turn {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    border: 1px solid #388e3c;
+}
+
+.status-waiting {
+    background-color: #fbe9e7;
+    color: #f4511e;
+    border: 1px solid #f4511e;
+}
+
+#end-screen {
+    text-align: center;
+    padding: 20px;
+    background: #fff8e1;
+    border: 2px solid #ffb300;
+    border-radius: 8px;
+    margin: 20px auto;
+}
+
+#end-message {
+    font-size: 1.5em;
+    color: #ffb300;
+}
+
+.player-1 { color: #FF0000; font-weight: bold; }
+.player-2 { color: #FFD700; font-weight: bold; }
