@@ -3,60 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Four Lobby</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dice Blackjack</title>
+    
+    <style>
+        /* --- CSS Styling --- */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a535c; /* Dark Teal Background */
+            color: #f7fff7; /* Light text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            background-color: #4ecdc4; /* Lighter Teal/Cyan */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #ff6b6b; /* Reddish accent */
+            margin-bottom: 5px;
+        }
+
+        #message {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 30px; /* Reserve space */
+        }
+
+        .hands-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .hand {
+            background-color: #a8a8a8; /* Grey area for hand */
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .hand h2 {
+            font-size: 1em;
+            margin-top: 0;
+            color: #333;
+        }
+
+        .dice-area {
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Dice Styling */
+        .die {
+            background-color: #f7fff7; /* White dice */
+            color: #333;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease-out;
+        }
+
+        .die.hidden-die {
+            background-color: #333;
+            color: #f7fff7;
+            font-size: 1em;
+        }
+
+        /* Controls and Buttons */
+        .controls {
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+        }
+
+        #hit-button {
+            background-color: #ff6b6b; /* Red */
+            color: white;
+        }
+
+        #stay-button {
+            background-color: #ffe66d; /* Yellow */
+            color: #333;
+        }
+
+        #new-game-button {
+            background-color: #1a535c; /* Dark Teal */
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-    <div id="lobby-container">
-        <h1>Connect Four Lobby 🟡🔴</h1>
+    <div class="game-container">
+        <h1>🎲 Dice Blackjack</h1>
+        <p id="message">Hit or Stay?</p>
 
-        <section id="player-setup">
-            <input type="text" id="playerNameInput" placeholder="Enter your name">
-            <button id="enterLobbyBtn">Join Lobby</button>
-            <button id="createRoomBtn" disabled>Create Game</button>
-        </section>
-
-        <section id="lobby-view" class="hidden">
-            <div class="column">
-                <h2>Online Players <span class="status green"></span></h2>
-                <div id="onlinePlayers" class="list-container">
+        <div class="hands-container">
+            <div class="hand dealer-hand">
+                <h2>Dealer's Hand (<span id="dealer-score">?</span>)</h2>
+                <div id="dealer-dice" class="dice-area">
                     </div>
             </div>
-            
-            <div class="column">
-                <h2>Open Games 🎮</h2>
-                <div id="roomsList" class="list-container">
+
+            <div class="hand player-hand">
+                <h2>Your Hand (<span id="player-score">0</span>)</h2>
+                <div id="player-dice" class="dice-area">
                     </div>
             </div>
-        </section>
+        </div>
+
+        <div class="controls">
+            <button id="hit-button" class="action-btn">Hit (Roll)</button>
+            <button id="stay-button" class="action-btn">Stay</button>
+            <button id="new-game-button" class="action-btn hidden">New Game</button>
+        </div>
     </div>
 
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-        import { getDatabase } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-        
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBySHqskyLl4eUi0UAo6CY-C_AX_m_JnzQ",
-            authDomain: "connectfour-1020c.firebaseapp.com",
-            projectId: "connectfour-1020c",
-            storageBucket: "connectfour-1020c.firebasestorage.app",
-            messagingSenderId: "14071080478",
-            appId: "1:14071080478:web:37c06682fbbc504a3b700f",
-            measurementId: "G-DM0TF8W4PF",
-            databaseURL:"https://connectfour-1020c-default-rtdb.firebaseio.com/"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app); // Initialized but not actively used in JS logic
-        
-        // Expose db object to window for easy access in lobby.js/game.js modules
-        window.db = getDatabase(app); 
-    </script>
-    <script type="module" src="lobby.js"></script>
-</body>
+    <script>
+        // --- JavaScript Logic ---
 
+        // --- DOM Elements ---
+        const dealerDiceEl = document.getElementById('dealer-dice');
+        const playerDiceEl = document.getElementById('player-dice');
+        const dealerScoreEl = document.getElementById('dealer-score');
+        const playerScoreEl = document.getElementById('player-score');
+        const messageEl = document.getElementById('message');
+        const hitBtn = document.getElementById('hit-button');
+        const stayBtn = document.getElementById('stay-button');
+        const newGameBtn = document.getElementById('new-game-button');
+
+        // --- Game State Variables ---
+        let playerHand = [];
+        let dealerHand = [];
+        const WINNING_SCORE = 21;
+        const DEALER_STAY_SCORE = 17;
+
+        // --- Core Game Functions ---
+
+        /**
+         * Simulates rolling a single 6-sided die (d6).
+         */
+        function rollDice() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        /**
+         * Calculates the total score of a hand.
+         */
+        function calculateScore(hand) {
+            return hand.reduce((sum, value) => sum + value, 0);
+        }
+
+        /**
+         * Renders the dice on the screen and updates the score.
+         */
+        function renderHand(hand, diceAreaEl, scoreEl, isDealer, isInitialDeal = false) {
+            diceAreaEl.innerHTML = '';
+            
+            hand.forEach((value, index) => {
+                const dieEl = document.createElement('div');
+                dieEl.classList.add('die');
+                
+                let displayValue = value;
+                // Determine if the die should be hidden (only for dealer's second die at start)
+                let isHidden = isDealer && isInitialDeal && index === 1;
+
+                if (isHidden) {
+                    displayValue = '?';
+                    dieEl.classList.add('hidden-die');
+                }
+                
+                dieEl.textContent = displayValue;
+                diceAreaEl.appendChild(dieEl);
+            });
+
+            const score = calculateScore(hand);
+            if (isDealer && isInitialDeal) {
+                scoreEl.textContent = '?';
+            } else {
+                scoreEl.textContent = score;
+            }
+        }
+
+        /**
+         * Checks for initial Blackjack and starts the player's turn.
+         */
+        function startGame() {
+            // Reset scores and hands
+            playerHand = [rollDice(), rollDice()];
+            dealerHand = [rollDice(), rollDice()];
+            
+            // Render initial hands
+            renderHand(playerHand, playerDiceEl, playerScoreEl, false);
+            renderHand(dealerHand, dealerDiceEl, dealerScoreEl, true, true); // Hide dealer's second die
+
+            // Reset buttons
+            hitBtn.classList.remove('hidden');
+            stayBtn.classList.remove('hidden');
+            newGameBtn.classList.add('hidden');
+            hitBtn.disabled = false;
+            stayBtn.disabled = false;
+            
+            messageEl.textContent = "Hit or Stay?";
+
+            // Check for immediate Player Blackjack
+            if (calculateScore(playerHand) === WINNING_SCORE) {
+                messageEl.textContent = "Blackjack! Waiting for Dealer...";
+                hitBtn.disabled = true;
+                stayBtn.disabled = true;
+                setTimeout(dealerTurn, 1000);
+            }
+        }
+
+        /**
+         * Handles the Player's 'Hit' action.
+         */
+        function playerHit() {
+            playerHand.push(rollDice());
+            renderHand(playerHand, playerDiceEl, playerScoreEl, false);
+            
+            const score = calculateScore(playerHand);
+
+            if (score > WINNING_SCORE) {
+                messageEl.textContent = "Player BUSTS! Dealer Wins.";
+                endGame();
+            } else if (score === WINNING_SCORE) {
+                messageEl.textContent = "Player hits 21! Waiting for Dealer...";
+                hitBtn.disabled = true;
+                stayBtn.disabled = true;
+                setTimeout(dealerTurn, 1000);
+            }
+        }
+
+        /**
+         * Handles the Player's 'Stay' action and starts the Dealer's turn.
+         */
+        function playerStay() {
+            hitBtn.disabled = true;
+            stayBtn.disabled = true;
+            messageEl.textContent = "Dealer's Turn...";
+            setTimeout(dealerTurn, 1000);
+        }
+
+        /**
+         * Executes the Dealer's decision process (must hit on < 17).
+         */
+        function dealerTurn() {
+            let dealerScore = calculateScore(dealerHand);
+            
+            // 1. Reveal the hidden die
+            renderHand(dealerHand, dealerDiceEl, dealerScoreEl, true, false);
+
+            // 2. The hitting loop
+            const dealerLoop = setInterval(() => {
+                if (dealerScore < DEALER_STAY_SCORE) {
+                    messageEl.textContent = "Dealer Hits...";
+                    dealerHand.push(rollDice());
+                    dealerScore = calculateScore(dealerHand);
+                    renderHand(dealerHand, dealerDiceEl, dealerScoreEl, true, false);
+                    
+                    if (dealerScore > WINNING_SCORE) {
+                        clearInterval(dealerLoop);
+                        messageEl.textContent = "Dealer BUSTS! Player Wins!";
+                        endGame();
+                    } else if (dealerScore === WINNING_SCORE) {
+                        clearInterval(dealerLoop);
+                        messageEl.textContent = "Dealer hits 21!";
+                        // Check winner in case player also has 21 (Push)
+                        setTimeout(checkWinner, 1000);
+                    }
+                } else {
+                    clearInterval(dealerLoop);
+                    messageEl.textContent = `Dealer Stays on ${dealerScore}.`;
+                    // Check for winner only after dealer is finished
+                    setTimeout(checkWinner, 1000); 
+                }
+            }, 1000); // 1-second delay for dramatic effect
+        }
+
+        /**
+         * Compares final scores and determines the winner.
+         */
+        function checkWinner() {
+            const playerScore = calculateScore(playerHand);
+            const dealerScore = calculateScore(dealerHand);
+            let resultMessage = '';
+
+            if (playerScore > WINNING_SCORE) {
+                resultMessage = "Player BUSTS! Dealer Wins.";
+            } else if (dealerScore > WINNING_SCORE) {
+                resultMessage = "Dealer BUSTS! Player Wins!";
+            } else if (playerScore > dealerScore) {
+                resultMessage = "Player Wins!";
+            } else if (dealerScore > playerScore) {
+                resultMessage = "Dealer Wins!";
+            } else {
+                resultMessage = "It's a Push (Tie)!";
+            }
+
+            messageEl.textContent = resultMessage;
+            endGame();
+        }
+
+        /**
+         * Disables game buttons and shows the 'New Game' button.
+         */
+        function endGame() {
+            hitBtn.classList.add('hidden');
+            stayBtn.classList.add('hidden');
+            newGameBtn.classList.remove('hidden');
+            hitBtn.disabled = true;
+            stayBtn.disabled = true;
+        }
+
+
+        // --- Event Listeners ---
+        hitBtn.addEventListener('click', playerHit);
+        stayBtn.addEventListener('click', playerStay);
+        newGameBtn.addEventListener('click', startGame);
+
+        // Start the game when the page loads
+        startGame();
+    </script>
+</body>
 </html>
